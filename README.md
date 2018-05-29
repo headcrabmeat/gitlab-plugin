@@ -437,6 +437,51 @@ To add a note to GitLab merge requests after the build completes, select 'Add no
 ## Parameterized builds
 You can trigger a job manually by clicking 'This build is parameterized' in the job configuration and adding any of the relevant build parameters. See the [defined parameters](#defined-parameters) list. If you only care about jobs being triggered from GitLab webhooks, this step is unnecessary.
 
+## Notify Specific project by a specific gitlab connection
+You can specify a map of project builds to notify a vary of gitlab repositories which could be located on different servers
+This is useful if you want to create a complex CI/CD which involve several jenkins and gitlab projects, see examples bellow:
+
+* Notify several gitlab projects using gitlab connection data from the trigger context
+```groovy
+gitlabCommitStatus(name: 'stage1',
+        builds: [
+            [projectId: 'test/test', revisionHash: 'master'],
+            [projectId: 'test/utils', revisionHash: 'master'],
+        ])
+    {
+            echo 'Hello World'
+    }
+```
+
+* Notify several gitlab projects using specific gitlab connection
+```groovy
+gitlabCommitStatus( name: 'stage1', connection:[gitLabConnection:'site1-connection'],
+        builds: [
+            [projectId: 'test/test', revisionHash: 'master'],
+            [projectId: 'test/utils', revisionHash: 'master'],
+        ])
+    {
+            echo 'Hello World'
+    }
+```
+
+* Notify several gitlab repositories located on different gitlab servers
+```groovy
+gitlabCommitStatus(
+        builds: [
+            [name:'stage1',connection:[gitLabConnection:'site1-connection'], projectId: 'group/project1', revisionHash: 'master'],
+            [name:'stage1',connection:[gitLabConnection:'site2-connection'], projectId: 'group/project1', revisionHash: 'master'],
+            [name:'stage1',connection:[gitLabConnection:'site2-connection'], projectId: 'test/test', revisionHash: 'master'],
+            [name:'stage1',connection:[gitLabConnection:'site2-connection'], projectId: 'test/utils', revisionHash: 'master'],
+        ])
+    {
+            echo 'Hello World'
+    }
+```
+
+
+
+
 # Contributing to the Plugin
 
 Plugin source code is hosted on [Github](https://github.com/jenkinsci/gitlab-plugin).
